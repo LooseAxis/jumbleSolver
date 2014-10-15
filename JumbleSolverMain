@@ -1,0 +1,61 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Set;
+
+public class JumbleSolver {
+
+	public static void main(String[] args) throws FileNotFoundException{
+		Scanner dictionaryReader = new Scanner(new File("dictionary.txt"));
+		Set<String> dictionary = fillDictionary(dictionaryReader);
+		Scanner userInput = new Scanner(System.in);
+		System.out.print("Please enter the jumbled letters: ");
+		String letters = userInput.next();
+		Set<String> possibleAnswers = getPossible(letters, dictionary);
+		System.out.println(possibleAnswers);
+		
+	}
+	
+	//used to move the text file into a set of dictionary words
+	public static Set<String> fillDictionary(Scanner input){
+		Set<String> output = new HashSet<String>();
+		while(input.hasNextLine()){
+			String word = input.nextLine();
+			output.add(word);
+		}
+		return output;
+	}
+	
+	//wrapper for recursive solution creation
+	private static Set<String> getPossible (String letters, Set<String> dictionary){
+		char[] letters2 = letters.toCharArray();
+		List<Character> remaining = new ArrayList<Character>();
+		for(int i = 0; i < letters2.length; i++){
+			remaining.add(letters2[i]);
+		}
+		Set<String> solutions = new HashSet<String>();
+		solutionHelper(remaining, solutions, "", dictionary);
+		return solutions;
+	}
+	
+	private static void solutionHelper (List<Character> remaining, Set<String> solutions, String current, Set<String> dictionary){
+		String internalCurrent = current;
+		if(remaining.size() == 0){
+			if(dictionary.contains(internalCurrent)){
+				solutions.add(internalCurrent);
+			}
+		}
+		else if(remaining.size() > 0){
+			for(int i = 0; i < remaining.size(); i++){
+				internalCurrent += remaining.get(i);
+				char temp = remaining.remove(i);
+				solutionHelper(remaining, solutions, internalCurrent, dictionary);
+				internalCurrent = current;
+				remaining.add(i,temp);
+			}
+		}
+	}
+}
